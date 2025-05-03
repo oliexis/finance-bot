@@ -1,9 +1,10 @@
-import os
 from flask import Flask, request
 from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, ContextTypes
+import asyncio
+import os
 
-TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = "7562255380:AAH0WedxSC7zcRNVLFFZyoLwba i4-nwU4SU"  # ← твой токен уже вставлен
 bot = Bot(token=TOKEN)
 app = Flask(__name__)
 
@@ -22,11 +23,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 application.add_handler(CommandHandler("start", start))
 
 if __name__ == "__main__":
-    import asyncio
     async def run():
         await application.initialize()
         await application.start()
-        print("Bot is ready and webhook is set.")
 
-    asyncio.run(run())
-    app.run(host="0.0.0.0", port=10000)
+    asyncio.get_event_loop().create_task(run())
+    port = int(os.environ.get("PORT", 10000))  # Render требует порт из переменной
+    app.run(host="0.0.0.0", port=port)
