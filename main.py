@@ -4,7 +4,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 import asyncio
 import os
 
-TOKEN = "7562255380:AAH0WedxSC7zcRNVLFFZyoLwba i4-nwU4SU"  # ← твой токен уже вставлен
+TOKEN = "7562255380:AAH0WedxSC7zcRNVLFFZyoLwbai4-nwU4SU"  # ← без пробела
 bot = Bot(token=TOKEN)
 app = Flask(__name__)
 
@@ -28,5 +28,5 @@ if __name__ == "__main__":
         await application.start()
 
     asyncio.get_event_loop().create_task(run())
-    port = int(os.environ.get("PORT", 10000))  # Render требует порт из переменной
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port, threaded=True)
