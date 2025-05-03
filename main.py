@@ -1,8 +1,6 @@
 import os
-import asyncio
-import threading
 from flask import Flask, request
-from telegram import Bot, Update
+from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 TOKEN = os.getenv("BOT_TOKEN")
@@ -12,9 +10,10 @@ app = Flask(__name__)
 application = Application.builder().token(TOKEN).build()
 
 @app.route(f"/{TOKEN}", methods=["POST"])
-def webhook():
-    update = Update.de_json(request.get_json(force=True), bot)
-    application.update_queue.put_nowait(update)
+async def webhook():
+    data = request.get_json(force=True)
+    update = Update.de_json(data, bot)
+    await application.process_update(update)
     return "OK"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -22,14 +21,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 application.add_handler(CommandHandler("start", start))
 
-def run_app():
-    app.run(host="0.0.0.0", port=10000)
-
-async def start_application():
-    await application.initialize()
-    await application.start()
-    await application.updater.start_polling()  # нужно для готовности очереди
-
 if __name__ == "__main__":
-    threading.Thread(target=run_app).start()
-    asyncio.run(start_application())
+    import asyncio
+    loop = asyncio.get_event_loop()
+    loop.create_task(application.initialize())
+    loop.create_task(application.start())
+    app.run(host="0.0.0.0", port=10000)
