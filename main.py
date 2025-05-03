@@ -1,4 +1,6 @@
 import os
+import asyncio
+import threading
 from flask import Flask, request
 from telegram import Bot, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -20,5 +22,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 application.add_handler(CommandHandler("start", start))
 
-if __name__ == "__main__":
+def run_app():
     app.run(host="0.0.0.0", port=10000)
+
+async def start_application():
+    await application.initialize()
+    await application.start()
+    await application.updater.start_polling()  # нужно для готовности очереди
+
+if __name__ == "__main__":
+    threading.Thread(target=run_app).start()
+    asyncio.run(start_application())
