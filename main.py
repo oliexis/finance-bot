@@ -29,4 +29,4 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=10000)
 
     threading.Thread(target=run_app).start()
-    asyncio.run(application.run_polling())  # запускает loop внутри
+    asyncio.run(application.run_polling())
