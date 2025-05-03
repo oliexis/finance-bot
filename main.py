@@ -1,7 +1,6 @@
 import os
-import asyncio
 from flask import Flask, request
-from telegram import Bot, Update
+from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 TOKEN = os.getenv("BOT_TOKEN")
@@ -11,10 +10,10 @@ app = Flask(__name__)
 application = Application.builder().token(TOKEN).build()
 
 @app.route(f"/{TOKEN}", methods=["POST"])
-def webhook():
+async def webhook():
     data = request.get_json(force=True)
     update = Update.de_json(data, bot)
-    asyncio.run_coroutine_threadsafe(application.process_update(update), application.bot.loop)
+    await application.process_update(update)
     return "OK"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -23,10 +22,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 application.add_handler(CommandHandler("start", start))
 
 if __name__ == "__main__":
-    import threading
+    import asyncio
+    async def run():
+        await application.initialize()
+        await application.start()
+        print("Bot is ready and webhook is set.")
 
-    def run_app():
-        app.run(host="0.0.0.0", port=10000)
-
-    threading.Thread(target=run_app).start()
-    asyncio.run(application.run_polling())
+    asyncio.run(run())
+    app.run(host="0.0.0.0", port=10000)
